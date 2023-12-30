@@ -4,6 +4,7 @@ import Pricing from "./pages/Pricing"
 import PageNotFount from "./pages/PageNotFount"
 import AppLayout from "./pages/AppLayout"
 import Homepage from "./pages/Homepage"
+import Login from "./pages/Login"
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
      <BrowserRouter>
        <Routes>
          <Route path="product" element={<Product/>}/>
+         <Route path="login" element={<Login/>}/>
          <Route path="/" element={<Homepage/>}/>
          <Route path="pracing" element={<Pricing/>}/>
          <Route path="app" element={<AppLayout/>}/>
