@@ -1,6 +1,10 @@
 // import { useParams } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styles from "./City.module.css";
+import { useCities } from "../context/CitiesContext";
+import { useEffect } from "react";
+import Spinner from "./Spinner";
+import Button from "./Button";
 
 const formatDate = (date) =>
   new Intl.DateTimeFormat("en", {
@@ -11,19 +15,23 @@ const formatDate = (date) =>
   }).format(new Date(date));
 
 export default function City() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const lat = searchParams.get('lat');
-    const lng = searchParams.get('lng');
-    // const {id} = useParams();
-  // TEMP DATA
-  const currentCity = {
-    cityName: "Lisbon",
-    emoji: "🇵🇹",
-    date: "2027-10-31T15:59:59.138Z",
-    notes: "My favorite city so far!",
-  };
+    //Geting with query 
+    // const [searchParams, setSearchParams] = useSearchParams();
+    // const lat = searchParams.get('lat');
+    // const lng = searchParams.get('lng');
+    
+    const {id} = useParams();
+    const{ getCity, currentCity, loading } = useCities();
+    const navigate = useNavigate();
 
+   useEffect(function(){
+    getCity(id);
+   },[id, getCity]);
+ 
   const { cityName, emoji, date, notes } = currentCity;
+
+  if(loading) return <Spinner/>;
+  
   return (
     <div className={styles.city}>
       <div className={styles.row}>
@@ -32,11 +40,11 @@ export default function City() {
           <span>{emoji}</span> {cityName}
         </h3>
         {/* Optional  */}
-        <h1>Map</h1>
-        <h1>Position: {lat} {lng}</h1>
+        {/* <h1>Map</h1>
+        <h1>Position: {currentCity.lat} {currentCity.lng}</h1>
         <button onClick={()=>{
              setSearchParams({lat: 23, lng:50});
-           }}>On change position</button>
+           }}>On change position</button> */}
            {/*  */}
 
       </div>
@@ -65,7 +73,10 @@ export default function City() {
       </div>
 
       <div>
-        {/* <ButtonBack /> */}
+      <Button type="back" onClick={(e)=> {
+            e.preventDefault();
+            navigate(-1);
+        }}>&larr; Back</Button>
       </div>
     </div>
   );
