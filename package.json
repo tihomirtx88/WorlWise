@@ -11,6 +11,8 @@
     "server": "json-server --watch data/cities.json --port 9000 --delay 500"
   },
   "dependencies": {
+    "@react-native-community/geolocation": "^3.1.0",
+    "@uidotdev/usehooks": "^2.4.1",
     "json-server": "^0.17.4",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
