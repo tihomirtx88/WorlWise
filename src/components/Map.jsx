@@ -1,31 +1,41 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+/* eslint-disable */
+
+import { useNavigate } from "react-router-dom";
 import styles from "./Map.module.css";
-import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvent } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  useMap,
+  useMapEvent,
+} from "react-leaflet";
 import { useEffect, useState } from "react";
 import { useCities } from "../context/CitiesContext";
 
 import useGGeolocation from "../hooks/useGGeolocation";
 import Button from "./Button";
+import useUrlPosition from "../hooks/useUrlPosition";
 
 export default function Map() {
+  const [lat, lng] = useUrlPosition();
   const { cities } = useCities();
-  const [mapPosition, setMapPosition] = useState([40, 0]);
-  const {isLoading: isLoadingPosition, positon: geolocationPosition, getPosition} = useGGeolocation();
-
-  const [searchParams] = useSearchParams();
-  const latMap = searchParams.get('lat');
-  const lngMap = searchParams.get('lng');
-
+  const [mapPosition, setMapPosition] = useState({ lat: null, lng: null });
+  const {
+    isLoading: isLoadingPosition,
+    positon: geolocationPosition,
+    getPosition,
+  } = useGGeolocation();
 
   // Set position in state
-  useEffect(()=>{
-    
-    if(latMap && lngMap) setMapPosition([latMap, lngMap]);
-  },[latMap, lngMap]);
+  useEffect(() => {
+    if (lat && lng) setMapPosition([lat, lng]);
+  }, [lat, lng]);
 
-  useEffect(()=>{
-    if(geolocationPosition) setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
-  },[geolocationPosition])
+  useEffect(() => {
+    if (geolocationPosition)
+      setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
+  }, [geolocationPosition]);
 
   return (
     <div className={styles.mapContainer}>
@@ -34,15 +44,15 @@ export default function Map() {
            <button onClick={()=>{
              setSearchParams({lat: 23, lng:50});
            }}>On change position</button> */}
-   
-          <Button type='position' onClick={()=> getPosition()}>
-          {isLoadingPosition ? 'Loading...' : 'Use your position'}
-        </Button>
-   
-    
+
+      <Button type="position" onClick={getPosition}>
+        {isLoadingPosition ? "Loading..." : "Use your position"}
+      </Button>
+
       <MapContainer
+
         center={mapPosition}
-        // center={[latMap,lngMap]}
+        // center={[lat,lng]}
         zoom={13}
         scrollWheelZoom={true}
         className={styles.map}
@@ -51,17 +61,26 @@ export default function Map() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
         />
-        {cities.map((city) => 
-          <>
-            <Marker position={[city.position.lat, city.position.lng]} key={city.id}>
-              <Popup>
-                <span>{city.emoji}</span><span>{city.cityName}</span>
-              </Popup>
-            </Marker>
-          </>
-        )}
-        <ChangeCenter position={mapPosition}/>
-        <DetectClick/>
+        {cities.map((city) => {
+          const lontitude = city.position.lng
+          const latitude = city.position.lat
+
+          if (lontitude && latitude) {
+            return (
+              <Marker
+                position={[city.position.lat, city.position.lng]}
+                key={city.id}
+              >
+                <Popup>
+                  <span>{city.emoji}</span>
+                  <span>{city.cityName}</span>
+                </Popup>
+              </Marker>
+            )
+          }
+        })}
+        <ChangeCenter position={mapPosition} />
+        <DetectClick />
       </MapContainer>
     </div>
   );
@@ -73,7 +92,7 @@ function ChangeCenter({ position }) {
   return null;
 }
 
-function DetectClick(){
+function DetectClick() {
   const navigate = useNavigate();
 
   useMapEvent({
