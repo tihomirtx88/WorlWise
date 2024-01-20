@@ -30,6 +30,7 @@ export default function City() {
  
   const { cityName, emoji, date, notes } = currentCity;
 
+
   if(loading) return <Spinner/>;
   
   return (
